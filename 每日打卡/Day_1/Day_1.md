@@ -57,3 +57,40 @@ class Solution {
     }
 }
 ```
+
+## Leetcode 977 有序数组的平方
+
+#### 题目链接: [题目](https://leetcode.cn/problems/squares-of-a-sorted-array/description/)
+
+#### 思路：
+
+这道题最主要就是要意识到一开始的 Array 也是 sorted，那么有一个很重要的关系就是，如果如果这个 Array 拥有负数，那么两边的平方都可能是最大的，然后中间的一定是最小的，所以我们中两边往中间 populate，而且是从大到小去 populate，这样子就不会有错。
+
+```Java
+class Solution {
+    public int[] sortedSquares(int[] nums) {
+        int n = nums.length;
+        int[] res = new int[n];
+        int l = 0, r = n -1;
+        int index = n -1;
+
+
+        while (l <= r){
+            int l_numb = nums[l] * nums[l];
+            int r_numb = nums[r] * nums[r];
+
+            if (l_numb > r_numb){
+                res[index] = l_numb;
+                l ++;
+
+            }else{
+                res[index] = r_numb;
+                r --;
+            }
+            index --;
+        }
+
+        return res;
+    }
+}
+```
