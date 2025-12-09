@@ -1,98 +1,158 @@
-# 代码随想录算法训练营第 3 天| Leetcode 24. 两两交换链表中的节点, Leetcode 19.删除链表的倒数第 N 个节点, 面试题 02.07. 链表相交, Leetcode 142.环形链表 II
+# 代码随想录算法训练营第3天|
 
-## Leetcode 24. 两两交换链表中的节点
+## Leetcode 203 移除链表元素
 
-#### 题目链接： [题目](https://leetcode.cn/problems/swap-nodes-in-pairs/)
-
-#### 思路
-
-这道题，其实最主要是 swap 的这个过程，每两个 node 需要 swap，所以我们是一对一对去 increment 我们的 loop。然后在每次的 loop 里，我们 perform 好这个 swap，swap 最重要的是改变 pointer 的顺序，顺序搞不清楚容易断掉。
-
-```Java
-/**
- * Definition for singly-linked list.
- * public class ListNode {
- *     int val;
- *     ListNode next;
- *     ListNode() {}
- *     ListNode(int val) { this.val = val; }
- *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
- * }
- */
-
-class Solution {
-    public ListNode swapPairs(ListNode head) {
-        ListNode dummy = new ListNode(0, head);
-        ListNode prev = dummy;
-
-        while (prev.next != null && prev.next.next != null){
-            ListNode front = prev.next;
-            ListNode back = prev.next.next;
-
-            // swap:
-            prev.next = back;
-            front.next = back.next;
-            back.next = front;
-
-            // increment:
-            prev = prev.next.next;
-
-        }
-        return dummy.next;
-    }
-}
-```
-
-## Leetcode 19.删除链表的倒数第 N 个节点
-
-#### 题目链接: [题目](https://leetcode.cn/problems/remove-nth-node-from-end-of-list/description/)
+#### 题目链接： [题目](https://leetcode.cn/problems/remove-linked-list-elements/)
 
 #### 思路:
+思路就是用一个 dummy node 和双指针，去处理头尾节点可能也要被删除的可能性。
 
-这道题可以用到一个 two pointer 的方法，我们可以算出 fast 和 slow pointer 的 diff 一定是 n + 1， 这样的话，当 fast 到了尽头，我们 slow 也到了可以去删除的地方。这样子省去了很多 if statement 和一些没有必要的 loop 去算长度。
 
 ```Java
-/**
- * Definition for singly-linked list.
- * public class ListNode {
- *     int val;
- *     ListNode next;
- *     ListNode() {}
- *     ListNode(int val) { this.val = val; }
- *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
- * }
- */
 class Solution {
-    public ListNode removeNthFromEnd(ListNode head, int n) {
-        ListNode dummy = new ListNode(0, head);
-        ListNode fast = dummy;
-        ListNode slow = dummy;
+    public ListNode removeElements(ListNode head, int val) {
+        // we use a two pointer:
+         ListNode dummy = new ListNode(0);
+         dummy.next = head;
 
-        for (int i = 0; i < n; i++){
-            fast = fast.next;
-        }
+         ListNode prev = dummy;
+         ListNode curr = head;
 
-        // going together with the same diff;
-        while (fast.next != null){
-            fast = fast.next;
-            slow = slow.next;
-        }
+         while (curr != null){
+            if (curr.val == val){
+                // 跳过当前节点
+                prev.next = curr.next; 
+            }else{
+                // increment prev
+                prev = curr;
+            }
+            // increment cur
+            curr = curr.next; 
+         }
 
-        slow.next = slow.next.next;
-
-        return dummy.next;
+         return dummy.next;
     }
 }
 ```
 
-## 面试题 02.07. 链表相交
+## 707.设计链表
 
-#### 题目链接: [题目](https://leetcode.cn/problems/intersection-of-two-linked-lists-lcci/description/)
+#### 题目链接: [题目](https://leetcode.cn/problems/design-linked-list/)
+
+#### 思路:
+这道题，主要有点复杂的就是 add 和 delete，但是具体就是找到 prev 和 next，其实就可以进行一个增加或者删除。
+
+
+```Java
+class MyLinkedList {
+
+    class Node {
+        int val; 
+        Node prev; 
+        Node next; 
+        Node (int val) {
+            this.val = val;
+        }
+    }
+        private Node head;
+        private Node tail;
+        private int size;
+
+    public MyLinkedList() {
+        head = new Node(0);
+        tail = new Node(0);
+
+        head.next = tail; 
+        tail.prev = head; 
+
+        size = 0;
+    }
+    
+    public int get(int index) {
+         if (index < 0 || index >= size) return -1; 
+
+         Node curr = head.next;
+         for (int i = 0; i < index; i ++){
+            curr = curr.next;
+         }
+
+         return curr.val;
+    }
+
+    public void addAtHead(int index, int val){
+        if (index < 0 || index > size) {
+            return;
+        }
+
+        Node prev = head;
+
+        for (int i = 0; i < index; i++) {
+            prev = prev.next;
+        }
+        Node next = prev.next; 
+
+        // insert:
+        Node newNode = new Node(val);
+        newNode.prev = head;
+        newNode.next = next; 
+        prev.next = newNode;
+        next.prev = newNode;
+
+        size ++; 
+    }
+    
+    public void addAtHead(int val) {
+        addAtHead(0, val);
+    }
+
+    
+    public void addAtTail(int val) {
+        addAtHead(size, val);
+    }
+    
+    public void addAtIndex(int index, int val) {
+        if (index < 0 || index > size) return;
+
+
+        // find the place to insert: 
+        Node prev = head; 
+        for (int i = 0; i < index; i ++){
+            prev =  prev.next;
+        }
+        Node next = prev.next;
+
+        // insert:
+        Node newNode = new Node (val);
+        newNode.prev = prev;
+        newNode.next = next;
+        prev.next = newNode;
+        next.prev = newNode;
+
+    }
+    
+    public void deleteAtIndex(int index) {
+        if (index < 0 || index >= size) return;
+
+        Node curr = head.next; 
+        for (int i = 0; i < index; i++){
+            curr = curr.next; 
+        }
+
+        curr.prev.next = curr.next; 
+        curr.next.prev = curr.prev;
+    }
+}
+```
+
+## Leetcode 206 反转列表
+
+#### 题目链接: [题目](https://leetcode.cn/problems/reverse-linked-list/description/)
 
 #### 思路：
 
-这道题，主要是知道一个公式。 就是我们用 pa 和 pb 从两头出发，两个一直走，走到头后切换到另一个链表继续走。
-两者走的总长度相同，所以会在交点 c1 相遇！
+其实这道题用双指针的方法，分为四个步骤，找到 next，反转，更新 prev，更新 next。 但是在处理双指针的时候，容易复杂化指针的变化。
+
+
 
 ```Java
 /**
@@ -100,84 +160,26 @@ class Solution {
  * public class ListNode {
  *     int val;
  *     ListNode next;
- *     ListNode(int x) {
- *         val = x;
- *         next = null;
- *     }
+ *     ListNode() {}
+ *     ListNode(int val) { this.val = val; }
+ *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
  * }
  */
-public class Solution {
-    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
-        ListNode pA = headA;
-        ListNode pB = headB;
+class Solution {
+    public ListNode reverseList(ListNode head) {
+        if (head == null) return null; 
 
-        while (pA != pB) {
-            if (pA == null) {
-                pA = headB;
-            } else {
-                pA = pA.next;
-            }
+        ListNode prev = null; 
+        ListNode curr = head; 
 
-            if (pB == null) {
-                pB = headA;
-            } else {
-                pB = pB.next;
-            }
+        while (curr != null) {
+            ListNode next = curr.next;
+            curr.next = prev;
+            prev = curr;
+            curr = next;
         }
+        return prev;
 
-        return pA;
-
-    }
-}
-```
-
-## Leetcode 142.环形链表 II
-
-#### 题目链接: [题目](https://leetcode.cn/problems/linked-list-cycle-ii/)
-
-#### 思路:
-
-这道题分两个部分：
-1） 判断是否是 loop：
-
-这里我们可以用到一个快慢指针，快指针每次走两步，慢指针每次走两步，特定的环形能保证快慢指针一定会 meet，如果在环的情况下。如果没有环，那我们也会 eventually 到 end。
-
-2）如果是 loop 找 intry：
-当快慢指针第一次相遇时，slow 走的距离是 fast 的一半。假设 slow 从入口走了 b 步到达相遇点，那么 fast 比 slow 多走的路程刚好是环的整数倍。
-这意味着什么？从 head 到入口的距离，等于从相遇点继续往前走到入口的距离（可能要绕几圈）。
-所以我们让两个指针分别从 head 和相遇点出发，每次都走一步，它们一定会在入口相遇。因为当第一个指针刚好走到入口时，第二个指针也恰好走完相同的步数到达入口。
-
-```Java
-/**
- * Definition for singly-linked list.
- * class ListNode {
- *     int val;
- *     ListNode next;
- *     ListNode(int x) {
- *         val = x;
- *         next = null;
- *     }
- * }
- */
-public class Solution {
-    public ListNode detectCycle(ListNode head) {
-        // flast slow pointer;
-        ListNode fast = head;
-        ListNode slow = head;
-
-        while (fast != null && fast.next != null){
-            fast = fast.next.next;
-            slow = slow.next;
-            if (fast == slow){
-                ListNode ptr = head;
-                while (ptr != slow){
-                    ptr = ptr.next;
-                    slow = slow.next;
-                }
-                return ptr;
-            }
-        }
-    return null;
     }
 }
 ```
