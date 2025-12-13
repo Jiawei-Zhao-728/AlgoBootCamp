@@ -89,13 +89,18 @@ public class Main {
             }
         }
 
-        return sb.toString();
+        return sb.toString(); 
     }
 
     public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        String s = sc.next(); 
         Main main = new Main();
-        String result = main.replaceNumber("a1b2c3");
-        System.out.println(result);
+        String result = main.replaceNumber(s);
+        System.out.println(result); 
+        
+        sc.close();
+
     }
 
 }
