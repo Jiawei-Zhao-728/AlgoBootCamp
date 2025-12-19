@@ -1,33 +1,23 @@
-# 代码随想录算法训练营第 14 天| Leetcode 110. 平衡二叉树, Leetcode 257. 二叉树的所有路径, Leetcode 404. 左叶子之和, Leetcode 222. 完全二叉树的节点个数
+# 代码随想录算法训练营第 14 天| Leetcode 226. 翻转二叉树, Leetcode 101. 对称二叉树, Leetcode 104. 二叉树的最大深度, Leetcode 111. 二叉树的最小深度
 
-## Leetcode 110. 平衡二叉树（优先掌握递归）
+## Leetcode 226. 翻转二叉树（优先掌握递归）
 
-#### 题目链接： [题目](https://leetcode.cn/problems/balanced-binary-tree/)
+#### 题目链接： [题目](https://leetcode.cn/problems/invert-binary-tree/)
 
 #### 思路：
 
-**平衡二叉树定义**：每个节点的左右两个子树的高度差的绝对值不超过 1
+翻转二叉树：交换每个节点的左右子树
 
 **递归方法（后序遍历）**：
 
-1. 确定递归函数参数和返回值：`int getheight(TreeNode node)`，返回节点高度，如果返回 -1 表示不平衡
-2. 确定终止条件：`if (node == null) return 0;`（空节点高度为 0）
+1. 确定递归函数参数和返回值：`TreeNode invertTree(TreeNode root)`
+2. 确定终止条件：`if (root == null) return null;`
 3. 确定单层递归逻辑：
-   - 递归求左子树高度，如果为 -1 直接返回 -1（不平衡）
-   - 递归求右子树高度，如果为 -1 直接返回 -1（不平衡）
-   - 判断左右高度差：`if (Math.abs(l - r) > 1) return -1;`
-   - 返回当前节点高度：`1 + max(左高度, 右高度)`
+   - 先递归翻转左子树
+   - 再递归翻转右子树
+   - 最后交换当前节点的左右子树
 
-**为什么用 -1 作为标记？**
-
-- 正常高度 ≥ 0，用 -1 表示"不平衡"状态
-- 可以在递归过程中**提前终止**，一旦发现不平衡就向上传递 -1
-- 最后判断：`getheight(root) != -1` 即可
-
-**高度 vs 深度（巩固）**：
-
-- 这里计算的是**高度**（从下往上），因为需要从叶子节点向上累加
-- 后序遍历：先知道左右子树高度，才能判断当前节点是否平衡
+**遍历顺序**：后序遍历（先处理左右子树，再处理根）
 
 时间复杂度：O(n)，每个节点访问一次
 空间复杂度：O(h)，递归栈深度为树高
@@ -35,143 +25,130 @@
 ```Java
 
 class Solution {
-    public boolean isBalanced(TreeNode root) {
-        return getheight(root) != -1;
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null) return null;
+
+        TreeNode l = invertTree(root.left);
+        TreeNode r = invertTree(root.right);
+
+        root.left = r;
+        root.right = l;
+
+        return root;
+    }
+}
+```
+
+## Leetcode 101. 对称二叉树（优先掌握递归）
+
+#### 题目链接: [题目](https://leetcode.cn/problems/symmetric-tree/)
+
+#### 思路:
+
+判断二叉树是否对称：比较左右子树是否镜像
+
+**递归方法**：
+
+1. 确定递归函数参数：需要同时比较两个节点 `isMirror(TreeNode l, TreeNode r)`
+2. 确定终止条件：
+   - 两个都为空 → `true`
+   - 一个为空一个不为空 → `false`
+   - 两个值不相等 → `false`
+3. 确定单层递归逻辑：
+   - 比较 `l.left` 和 `r.right`（外侧）
+   - 比较 `l.right` 和 `r.left`（内侧）
+   - 都对称才返回 `true`
+
+**关键点**：同时比较两个节点，而不是单个节点递归
+
+时间复杂度：O(n)，每个节点访问一次
+空间复杂度：O(h)，递归栈深度为树高
+
+```Java
+
+class Solution {
+    public boolean isSymmetric(TreeNode root) {
+        if (root == null) return true;
+        return isMirror(root.left, root.right);
     }
 
-    // since we need to keep track of height, we want a new recursive function:
-    public int getheight(TreeNode node){
-        // when hit the buttom
-        if (node == null){
-            return 0;
-        }
+    private boolean isMirror (TreeNode l, TreeNode r){
+        // base case:
+        if (l == null && r == null) return true;
+        if (l == null || r == null) return false;
 
-        int l = getheight(node.left);
-        int r = getheight(node.right);
+        if (l.val != r.val) return false;
 
-        if (l == -1) return -1;
-        if (r == -1) return -1;
+        return isMirror(l.left, r.right) && isMirror(r.left, l.right);
+    }
+}
+```
 
-        if (Math.abs(l - r) > 1) return -1;
+## Leetcode 104. 二叉树的最大深度（优先掌握递归）
 
-        // Here we get the height of the current node:
+#### 题目链接: [题目](https://leetcode.cn/problems/maximum-depth-of-binary-tree/)
+
+#### 思路：
+
+**深度 vs 高度**：
+
+- **深度**：从根节点到该节点的路径长度（从上往下）
+- **高度**：从该节点到叶子节点的最长路径长度（从下往上）
+- 根节点的深度 = 1，根节点的高度 = 树的高度
+
+**递归方法（后序遍历）**：
+
+1. 确定递归函数参数和返回值：`int maxDepth(TreeNode root)`，返回以 root 为根节点的树的最大深度
+2. 确定终止条件：`if (root == null) return 0;`（空节点深度为 0）
+3. 确定单层递归逻辑：
+   - 左子树最大深度：`maxDepth(root.left)`
+   - 右子树最大深度：`maxDepth(root.right)`
+   - 当前节点深度：`1 + max(左深度, 右深度)`
+
+**为什么用后序遍历？** 需要先知道左右子树的深度，才能计算当前节点的深度
+
+时间复杂度：O(n)，每个节点访问一次
+空间复杂度：O(h)，递归栈深度为树高
+
+```Java
+
+class Solution {
+    public int maxDepth(TreeNode root) {
+        if (root == null) return 0;
+
+        int l = maxDepth(root.left);
+        int r = maxDepth(root.right);
+
         return 1 + Math.max(l, r);
     }
 }
 ```
 
-## Leetcode 257. 二叉树的所有路径（优先掌握递归）
+## Leetcode 111. 二叉树的最小深度（优先掌握递归）
 
-#### 题目链接: [题目](https://leetcode.cn/problems/binary-tree-paths/)
-
-#### 思路:
-
-**DFS + 路径记录**
-
-1. **递归函数**：`getPath(TreeNode node, String path, List<String> allPath)`
-
-   - `node`：当前节点
-   - `path`：当前路径（String，不可变）
-   - `allPath`：存储所有路径的结果列表
-
-2. **处理当前节点**：`path += node.val`，把当前节点值加入路径
-
-3. **终止条件**：到达叶子节点（`left == null && right == null`），把完整路径加入结果并返回
-
-4. **递归左右子树**：
-   - 如果左子树不为空：`getPath(node.left, path + "->", allPath)`
-   - 如果右子树不为空：`getPath(node.right, path + "->", allPath)`
-   - 注意：传入的是 `path + "->"`，创建新字符串，不影响原 path
-
-**为什么不需要回溯？**
-
-- String 是不可变的，每次 `path + "->"` 都创建新对象
-- 递归返回时，上一层的 path 保持不变，自动"恢复"状态
-
-时间复杂度：O(n)，每个节点访问一次
-空间复杂度：O(h)，递归栈深度为树高
-
-```Java
-
-class Solution {
-    public List<String> binaryTreePaths(TreeNode root) {
-        List<String> res = new ArrayList<>();
-        getPath(root, "", res);;
-        return res;
-    }
-
-    private void getPath (TreeNode node, String path, List<String> allPath) {
-
-        path += node.val;
-
-        if (node.left == null && node.right == null){
-            allPath.add(path);
-            return;
-        }
-
-        if (node.left != null) {
-            getPath(node.left, path + "->", allPath);
-        }
-        if (node.right != null) {
-            getPath(node.right, path + "->", allPath);
-        }
-
-
-    }
-}
-```
-
-## Leetcode 404. 左叶子之和（优先掌握递归）
-
-#### 题目链接: [题目](https://leetcode.cn/problems/sum-of-left-leaves/)
-
-#### 思路：
-
-这道题其实就是通过 dfs，每个节点 check 一下，有没有 left leaf，有的话，就加进去。
-
-```Java
-
-class Solution {
-    public int sumOfLeftLeaves(TreeNode root) {
-        // we use dfs:
-        if (root == null) return 0;
-
-        int sum = 0;
-
-        // check if is left leaf:
-        if (root.left != null && root.left.left == null && root.left.right == null) {
-            sum += root.left.val;
-        }
-
-        sum += sumOfLeftLeaves(root.left);
-        sum += sumOfLeftLeaves(root.right);
-
-        return sum;
-    }
-
-
-}
-```
-
-## Leetcode 222. 完全二叉树的节点个数（优先掌握递归）
-
-#### 题目链接: [题目](https://leetcode.cn/problems/count-complete-tree-nodes/)
+#### 题目链接: [题目](https://leetcode.cn/problems/minimum-depth-of-binary-tree/)
 
 #### 思路:
+
+**最小深度 vs 最大深度的区别**：
+
+- **最大深度**：`1 + max(左深度, 右深度)`（即使一边为 null，另一边也有深度）
+- **最小深度**：必须到达**叶子节点**，不能直接用 `min`！
+
+**关键坑点**：当一边子树为 null 时：
+
+- 如果 `root.left == null`，最小深度 = `1 + 右子树最小深度`（不能走左子树）
+- 如果 `root.right == null`，最小深度 = `1 + 左子树最小深度`（不能走右子树）
+- 如果两边都不为 null，最小深度 = `1 + min(左深度, 右深度)`
 
 **递归方法（后序遍历）**：
 
-1. **终止条件**：`if (root == null) return 0;`（空节点返回 0）
-
-2. **单层递归逻辑**：
-   - 当前节点：`node = 1`（当前节点本身）
-   - 左子树节点数：`countNodes(root.left)`
-   - 右子树节点数：`countNodes(root.right)`
-   - 返回：`1 + 左子树节点数 + 右子树节点数`
-
-**思路**：当前节点（1 个）+ 左子树节点数 + 右子树节点数
-
-**注意**：这是普通二叉树的通用方法，完全二叉树可以用更优的方法（利用完全二叉树性质），但递归方法更通用
+1. 确定递归函数参数和返回值：`int minDepth(TreeNode root)`
+2. 确定终止条件：`if (root == null) return 0;`
+3. 确定单层递归逻辑：
+   - 先递归求左右子树最小深度
+   - **判断单边为 null 的情况**（关键！）
+   - 都不为 null 才用 `min`
 
 时间复杂度：O(n)，每个节点访问一次
 空间复杂度：O(h)，递归栈深度为树高
@@ -179,32 +156,16 @@ class Solution {
 ```Java
 
 class Solution {
-    public int countNodes(TreeNode root) {
-        if (root == null) return 0;
+    public int minDepth(TreeNode root) {
+        if (root == null)return 0;
 
-        int node = 0;
+        int l = minDepth(root.left);
+        int r = minDepth(root.right);
 
-        if (root != null){
-            node += 1;
-        }
-
-        node += countNodes(root.left);
-        node += countNodes(root.right);
-
-        return node;
+        // 最重要的两行逻辑，就是当 r 没有的时候 长度是 l + 1。 反过来也是一样。
+        if (root.right == null) return 1 + l;
+        if (root.left == null) return 1 + r;
+        return 1 + Math.min(l, r);
     }
 }
 ```
-
-## 总结
-
-### 核心技巧
-
-- **110 平衡二叉树**：用 -1 标记不平衡状态，计算高度的同时判断平衡性
-- **257 二叉树的所有路径**：DFS + String 路径记录，String 不可变所以不需要回溯
-- **404 左叶子之和**：判断左叶子：`node.left != null && node.left.left == null && node.left.right == null`
-- **222 完全二叉树的节点个数**：递归 = 1 + 左子树节点数 + 右子树节点数
-
-### 一句话
-
-今天主要是**递归的灵活应用**，注意区分高度和深度，理解路径收集的思路。
