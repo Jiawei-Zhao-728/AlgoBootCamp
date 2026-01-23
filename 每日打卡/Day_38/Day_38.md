@@ -6,8 +6,27 @@
 
 #### 思路：
 
+这要是一个找 prior best solution，然后通过coin 的面值来判断。
 
-```Java
+
+```Python
+class Solution:
+    def coinChange(self, coins: List[int], amount: int) -> int:
+        dp = [float('inf')] * (amount + 1)
+
+        dp[0] = 0
+
+        for i in range(1, len(dp)):
+            for coin in coins:
+
+                if i >= coin:
+                    dp[i] = min(dp[i], dp[i - coin] + 1)
+
+        
+        return dp[amount] if dp[amount] != float('inf') else -1
+
+
+
 
 ```
 
@@ -17,8 +36,30 @@
 
 #### 思路:
 
+思路其实和 coin 一样，我们其实就是做一个完全背包。
 
-```Java
+
+```python
+class Solution:
+    def numSquares(self, n: int) -> int:
+        squares = []
+        i = 1
+        while i * i <= n:
+            squares.append(i * i)
+            i += 1
+
+        
+        dp = [float("inf")] * (n + 1)
+        dp[0] = 0
+
+        for i in range(1, n + 1):
+            for j in squares:
+                if j <= i:
+                    dp[i] = min(dp[i - j] + 1, dp[i])
+
+
+        return dp[n]
+
 
 ```
 
@@ -29,8 +70,24 @@
 #### 思路：
 
 
-```Java
+```Python
+class Solution:
+    def wordBreak(self, s: str, wordDict: List[str]) -> bool:
+        n = len(s)
+        dp = [False] * (n + 1)
+        dp[0] = True
 
+        for i in range(1, n + 1): 
+            for word in wordDict:
+                word_len = len(word)
+
+                if i >= word_len and dp[i - word_len]:
+                    if s[i - word_len : i ] == word:
+                        dp[i] = True
+
+                        break
+        
+        return dp[n]
 ```
 
 ## 关于多重背包

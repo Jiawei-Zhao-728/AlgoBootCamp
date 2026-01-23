@@ -83,7 +83,7 @@ class Solution:
 巧妙呢
 
 
-```Java
+```Python
 class Solution:
     def climbStairs(self, n: int) -> int:
         steps = [1, 2]
