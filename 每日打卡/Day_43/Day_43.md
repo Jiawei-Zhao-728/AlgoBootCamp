@@ -11,9 +11,23 @@
 #### 思路：
 体会本题和 718. 最长重复子数组 的区别（子序列可以不连续）。
 
+还是差不多的意思，就是我们要选择，如果选择，那么我们就 dp【-1】 + 1 如果不是，就选择之前的最好 option。
 
 ```Python
+class Solution:
+    def longestCommonSubsequence(self, text1: str, text2: str) -> int:
+        n, m = len(text1), len(text2)
 
+        dp = [[0] * (m + 1) for _ in range(n + 1)]
+
+        for i in range(1, n + 1):
+            for j in range(1, m + 1):
+                if text1[i - 1] == text2[j - 1]:
+                    dp[i][j] = dp[i - 1][j - 1] + 1
+                else:
+                    dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+
+        return dp[n][m]
 ```
 
 #### 参考
@@ -29,9 +43,23 @@
 #### 思路：
 和 1143. 最长公共子序列 一模一样，可以自己先做一遍。
 
+一模一样代码 
 
 ```Python
+class Solution:
+    def maxUncrossedLines(self, nums1: List[int], nums2: List[int]) -> int:
+        n, m = len(nums1), len(nums2)
 
+        dp = [[0] * (m + 1) for _ in range(n + 1)]
+
+        for i in range(1, n + 1):
+            for j in range(1, m + 1):
+                if nums1[i - 1] == nums2[j - 1]:
+                    dp[i][j] = dp[i - 1][j - 1] + 1
+                else:
+                    dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+
+        return dp[n][m]
 ```
 
 #### 参考
@@ -46,10 +74,22 @@
 
 #### 思路：
 贪心做过一次，这次用 dp 再做一遍。
+思路就是，更新
 
 
 ```Python
+class Solution:
+    def maxSubArray(self, nums: List[int]) -> int:
+        cur_sum = 0
+        max_sub = nums[0]
 
+        for n in nums:
+            if cur_sum < 0:
+                cur_sum = 0
+            cur_sum += n
+            max_sub = max(max_sub, cur_sum)
+
+        return max_sub
 ```
 
 #### 参考
@@ -66,8 +106,18 @@
 编辑距离的入门题（这里只涉及“删除”），为后面的编辑距离打基础。
 
 
-```Python
 
+```Python
+class Solution:
+    def isSubsequence(self, s: str, t: str) -> bool:
+        i, j = 0 , 0
+
+        while i < len(s) and j < len(t):
+            if s[i] == t[j]:
+                i += 1
+            j += 1
+        
+        return i == len(s)
 ```
 
 #### 参考
