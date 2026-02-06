@@ -11,9 +11,27 @@
 #### 思路：
 比 392. 判断子序列 更难，体会和 392 在定义与转移上的区别。
 
+这道题也是一个二维 dp，然后很重要的一点是要在
+
 
 ```Python
+class Solution:
+    def numDistinct(self, s: str, t: str) -> int:
+        m, n = len(s), len(t)
+        dp = [[0] * (n + 1) for _ in range(m + 1)]
 
+        # initialize
+        for i in range(m + 1):
+            dp[i][0] = 1 
+
+        for i in range(1, m + 1):
+            for j in range(1, n + 1):
+                if s[i - 1] == t[j - 1]:
+                    dp[i][j] = dp[i - 1][j - 1] + dp[i - 1][j]
+                else:
+                    dp[i][j] = dp[i - 1][j]
+
+        return dp[m][n]
 ```
 
 #### 参考
@@ -28,9 +46,30 @@
 #### 思路：
 和 115 本质都是「删」，只是变成两个字符串都要删，情况更复杂，整体思路一致。
 
+这道题是删除，大概的 idea 是差不多的
+
 
 ```Python
+class Solution:
+    def minDistance(self, word1: str, word2: str) -> int:
+        n, m = len(word1), len(word2)
 
+        dp = [[0] * (m + 1) for _ in range(n + 1)]
+
+        for i in range(1, n + 1):
+            dp[i][0] = i 
+        
+        for j in range(1 , m + 1):
+            dp[0][j] = j
+
+        for i in range(1, n + 1):
+            for j in range(1, m + 1):
+                if word1[i - 1] == word2[j - 1]:
+                    dp[i][j] = dp[i - 1][j - 1]
+                else:
+                    dp[i][j] = min(dp[i - 1][j], dp[i][j -1]) + 1
+
+        return dp[n][m]
 ```
 
 #### 参考
@@ -47,7 +86,31 @@
 
 
 ```Python
+class Solution:
+    def minDistance(self, word1: str, word2: str) -> int:
+        # 每一次，我们根据长度差，来判断，我们时候需要删除，增加，还是更改，那么还是说，还是一个 2d dp
 
+        m, n = len(word1), len(word2)
+        dp = [[0] * (n + 1) for _ in range(m + 1)]
+        
+        # init:
+        for i in range(1, m + 1):
+            dp[i][0] = i 
+        
+        for j in range(1, n + 1):
+            dp[0][j] = j
+
+
+
+        for i in range(1, m + 1):
+            for j in range(1, n + 1):
+                if word1[i - 1] == word2[j - 1]:
+                    dp[i][j] = dp[i - 1][j - 1]
+                else: 
+                    dp[i][j] = 1 + min(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1])
+
+        
+        return dp[m][n]
 ```
 
 #### 参考
