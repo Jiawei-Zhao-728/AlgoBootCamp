@@ -1,30 +1,129 @@
-# 代码随想录算法训练营第 45 天 | 动态规划小结（子序列与编辑距离）
+# 代码随想录算法训练营第 45 天 | 第九章 动态规划 part12
 
-## 本阶段回顾
+## 编辑距离系列
 
-- **Day 41**：买卖股票进阶（188、309、714）+ 股票总结  
-- **Day 42**：子序列入门（300、674、718）  
-- **Day 43**：公共子序列与子序和（1143、1035、53、392）  
-- **Day 44**：编辑距离系列（115、583、72）+ 编辑距离总结  
+但相对于刚讲过的 392.判断子序列，本题 115 就有难度了，感受一下本题和 392.判断子序列的区别。583 和 115 相比，其实就是两个字符串都可以删除了，情况虽说复杂一些，但整体思路不变。最终迎来编辑距离；之前安排的题目都是为了编辑距离做铺垫。做一个总结吧。
 
-## 复习要点
+## Leetcode 115. 不同的子序列
 
-1. **子序列 vs 子数组**  
-   - 子序列：可不连续，通常 `dp[i][j]` 与 `i-1`、`j-1` 或「不选」相关。  
-   - 子数组/连续：一般以某点结尾的「连续段」为状态。  
+#### 题目链接：[题目](https://leetcode.cn/problems/distinct-subsequences/)
 
-2. **股票问题**  
-   - 状态：持股/不持股，必要时加「冷冻期」「交易次数」。  
-   - 转移时注意「今天买/今天卖」对状态的影响。  
+#### 思路：
+比 392. 判断子序列 更难，体会和 392 在定义与转移上的区别。
 
-3. **编辑距离**  
-   - 从 392（判断子序列）→ 115（不同子序列）→ 583（两串删除）→ 72（编辑距离），一步步加「删除、替换、插入」。  
-   - `dp[i][j]`：`s1[0..i]` 与 `s2[0..j]` 的某种最优值，转移考虑「匹配 / 删 / 插 / 换」。  
+这道题也是一个二维 dp，然后很重要的一点是要在
 
-## 今日建议
 
-- 从 Day 41～44 中选 2～3 道题重写一遍（如 300、718、72）。  
-- 如时间充裕，可做 1～2 道同类型力扣题巩固。  
+```Python
+class Solution:
+    def numDistinct(self, s: str, t: str) -> int:
+        m, n = len(s), len(t)
+        dp = [[0] * (n + 1) for _ in range(m + 1)]
+
+        # initialize
+        for i in range(m + 1):
+            dp[i][0] = 1 
+
+        for i in range(1, m + 1):
+            for j in range(1, n + 1):
+                if s[i - 1] == t[j - 1]:
+                    dp[i][j] = dp[i - 1][j - 1] + dp[i - 1][j]
+                else:
+                    dp[i][j] = dp[i - 1][j]
+
+        return dp[m][n]
+```
+
+#### 参考
+- [文章讲解](https://programmercarl.com/0115.%E4%B8%8D%E5%90%8C%E7%9A%84%E5%AD%90%E5%BA%8F%E5%88%97.html)
+
+---
+
+## Leetcode 583. 两个字符串的删除操作
+
+#### 题目链接：[题目](https://leetcode.cn/problems/delete-operation-for-two-strings/)
+
+#### 思路：
+和 115 本质都是「删」，只是变成两个字符串都要删，情况更复杂，整体思路一致。
+
+这道题是删除，大概的 idea 是差不多的
+
+
+```Python
+class Solution:
+    def minDistance(self, word1: str, word2: str) -> int:
+        n, m = len(word1), len(word2)
+
+        dp = [[0] * (m + 1) for _ in range(n + 1)]
+
+        for i in range(1, n + 1):
+            dp[i][0] = i 
+        
+        for j in range(1 , m + 1):
+            dp[0][j] = j
+
+        for i in range(1, n + 1):
+            for j in range(1, m + 1):
+                if word1[i - 1] == word2[j - 1]:
+                    dp[i][j] = dp[i - 1][j - 1]
+                else:
+                    dp[i][j] = min(dp[i - 1][j], dp[i][j -1]) + 1
+
+        return dp[n][m]
+```
+
+#### 参考
+- [文章讲解](https://programmercarl.com/0583.%E4%B8%A4%E4%B8%AA%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84%E5%88%A0%E9%99%A4%E6%93%8D%E4%BD%9C.html)
+
+---
+
+## Leetcode 72. 编辑距离
+
+#### 题目链接：[题目](https://leetcode.cn/problems/edit-distance/)
+
+#### 思路：
+真正的编辑距离题，前面几道都是为它做铺垫，建议认真推导状态与转移。
+
+
+```Python
+class Solution:
+    def minDistance(self, word1: str, word2: str) -> int:
+        # 每一次，我们根据长度差，来判断，我们时候需要删除，增加，还是更改，那么还是说，还是一个 2d dp
+
+        m, n = len(word1), len(word2)
+        dp = [[0] * (n + 1) for _ in range(m + 1)]
+        
+        # init:
+        for i in range(1, m + 1):
+            dp[i][0] = i 
+        
+        for j in range(1, n + 1):
+            dp[0][j] = j
+
+
+
+        for i in range(1, m + 1):
+            for j in range(1, n + 1):
+                if word1[i - 1] == word2[j - 1]:
+                    dp[i][j] = dp[i - 1][j - 1]
+                else: 
+                    dp[i][j] = 1 + min(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1])
+
+        
+        return dp[m][n]
+```
+
+#### 参考
+- [文章讲解](https://programmercarl.com/0072.%E7%BC%96%E8%BE%91%E8%B7%9D%E7%A6%BB.html)
+
+---
+
+## 编辑距离总结篇
+
+做一个总结吧。
+
+#### 参考
+- [为了绝杀编辑距离，卡尔做了三步铺垫](https://programmercarl.com/%E4%B8%BA%E4%BA%86%E7%BB%9D%E6%9D%80%E7%BC%96%E8%BE%91%E8%B7%9D%E7%A6%BB%EF%BC%8C%E5%8D%A1%E5%B0%94%E5%81%9A%E4%BA%86%E4%B8%89%E6%AD%A5%E9%93%BA%E5%9E%AB.html)
 
 ## 总结
 

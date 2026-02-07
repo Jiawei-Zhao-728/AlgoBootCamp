@@ -1,127 +1,127 @@
-# 代码随想录算法训练营第 44 天 | 第九章 动态规划 part12
+# 代码随想录算法训练营第 44 天 | 第九章 动态规划 part11
 
-## 编辑距离系列
+## 子序列与子数组
 
-115 比 392 更难，体会差异；583 是两串都要删，思路与 115 一脉相承；72 编辑距离是前面的收束，建议做完后看总结篇。
+体会 1143 和 718 的区别（子序列 vs 连续子数组）；1035 和 1143 本质相同；53 用 dp 再做一遍最大子序和；392 是编辑距离的入门（只涉及“删除”）。
 
-## Leetcode 115. 不同的子序列
+## Leetcode 1143. 最长公共子序列
 
-#### 题目链接：[题目](https://leetcode.cn/problems/distinct-subsequences/)
+#### 题目链接：[题目](https://leetcode.cn/problems/longest-common-subsequence/)
 
 #### 思路：
-比 392. 判断子序列 更难，体会和 392 在定义与转移上的区别。
+体会本题和 718. 最长重复子数组 的区别（子序列可以不连续）。
 
-这道题也是一个二维 dp，然后很重要的一点是要在
-
+还是差不多的意思，就是我们要选择，如果选择，那么我们就 dp【-1】 + 1 如果不是，就选择之前的最好 option。
 
 ```Python
 class Solution:
-    def numDistinct(self, s: str, t: str) -> int:
-        m, n = len(s), len(t)
-        dp = [[0] * (n + 1) for _ in range(m + 1)]
-
-        # initialize
-        for i in range(m + 1):
-            dp[i][0] = 1 
-
-        for i in range(1, m + 1):
-            for j in range(1, n + 1):
-                if s[i - 1] == t[j - 1]:
-                    dp[i][j] = dp[i - 1][j - 1] + dp[i - 1][j]
-                else:
-                    dp[i][j] = dp[i - 1][j]
-
-        return dp[m][n]
-```
-
-#### 参考
-- [文章讲解](https://programmercarl.com/0115.%E4%B8%8D%E5%90%8C%E7%9A%84%E5%AD%90%E5%BA%8F%E5%88%97.html)
-
----
-
-## Leetcode 583. 两个字符串的删除操作
-
-#### 题目链接：[题目](https://leetcode.cn/problems/delete-operation-for-two-strings/)
-
-#### 思路：
-和 115 本质都是「删」，只是变成两个字符串都要删，情况更复杂，整体思路一致。
-
-这道题是删除，大概的 idea 是差不多的
-
-
-```Python
-class Solution:
-    def minDistance(self, word1: str, word2: str) -> int:
-        n, m = len(word1), len(word2)
+    def longestCommonSubsequence(self, text1: str, text2: str) -> int:
+        n, m = len(text1), len(text2)
 
         dp = [[0] * (m + 1) for _ in range(n + 1)]
 
         for i in range(1, n + 1):
-            dp[i][0] = i 
-        
-        for j in range(1 , m + 1):
-            dp[0][j] = j
-
-        for i in range(1, n + 1):
             for j in range(1, m + 1):
-                if word1[i - 1] == word2[j - 1]:
-                    dp[i][j] = dp[i - 1][j - 1]
+                if text1[i - 1] == text2[j - 1]:
+                    dp[i][j] = dp[i - 1][j - 1] + 1
                 else:
-                    dp[i][j] = min(dp[i - 1][j], dp[i][j -1]) + 1
+                    dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
 
         return dp[n][m]
 ```
 
 #### 参考
-- [文章讲解](https://programmercarl.com/0583.%E4%B8%A4%E4%B8%AA%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%9A%84%E5%88%A0%E9%99%A4%E6%93%8D%E4%BD%9C.html)
+- [视频讲解](https://www.bilibili.com/video/BV1ye4y1L7CQ)
+- [文章讲解](https://programmercarl.com/1143.%E6%9C%80%E9%95%BF%E5%85%AC%E5%85%B1%E5%AD%90%E5%BA%8F%E5%88%97.html)
 
 ---
 
-## Leetcode 72. 编辑距离
+## Leetcode 1035. 不相交的线
 
-#### 题目链接：[题目](https://leetcode.cn/problems/edit-distance/)
+#### 题目链接：[题目](https://leetcode.cn/problems/uncrossed-lines/)
 
 #### 思路：
-真正的编辑距离题，前面几道都是为它做铺垫，建议认真推导状态与转移。
+和 1143. 最长公共子序列 一模一样，可以自己先做一遍。
+
+一模一样代码
+
+```Python
+class Solution:
+    def maxUncrossedLines(self, nums1: List[int], nums2: List[int]) -> int:
+        n, m = len(nums1), len(nums2)
+
+        dp = [[0] * (m + 1) for _ in range(n + 1)]
+
+        for i in range(1, n + 1):
+            for j in range(1, m + 1):
+                if nums1[i - 1] == nums2[j - 1]:
+                    dp[i][j] = dp[i - 1][j - 1] + 1
+                else:
+                    dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+
+        return dp[n][m]
+```
+
+#### 参考
+- [视频讲解](https://www.bilibili.com/video/BV1h84y1x7MP)
+- [文章讲解](https://programmercarl.com/1035.%E4%B8%8D%E7%9B%B8%E4%BA%A4%E7%9A%84%E7%BA%BF.html)
+
+---
+
+## Leetcode 53. 最大子序和
+
+#### 题目链接：[题目](https://leetcode.cn/problems/maximum-subarray/)
+
+#### 思路：
+贪心做过一次，这次用 dp 再做一遍。
+思路就是，更新
 
 
 ```Python
 class Solution:
-    def minDistance(self, word1: str, word2: str) -> int:
-        # 每一次，我们根据长度差，来判断，我们时候需要删除，增加，还是更改，那么还是说，还是一个 2d dp
+    def maxSubArray(self, nums: List[int]) -> int:
+        cur_sum = 0
+        max_sub = nums[0]
 
-        m, n = len(word1), len(word2)
-        dp = [[0] * (n + 1) for _ in range(m + 1)]
-        
-        # init:
-        for i in range(1, m + 1):
-            dp[i][0] = i 
-        
-        for j in range(1, n + 1):
-            dp[0][j] = j
+        for n in nums:
+            if cur_sum < 0:
+                cur_sum = 0
+            cur_sum += n
+            max_sub = max(max_sub, cur_sum)
 
-
-
-        for i in range(1, m + 1):
-            for j in range(1, n + 1):
-                if word1[i - 1] == word2[j - 1]:
-                    dp[i][j] = dp[i - 1][j - 1]
-                else: 
-                    dp[i][j] = 1 + min(dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1])
-
-        
-        return dp[m][n]
+        return max_sub
 ```
 
 #### 参考
-- [文章讲解](https://programmercarl.com/0072.%E7%BC%96%E8%BE%91%E8%B7%9D%E7%A6%BB.html)
+- [视频讲解](https://www.bilibili.com/video/BV19V4y1F7b5)
+- [文章讲解](https://programmercarl.com/0053.%E6%9C%80%E5%A4%A7%E5%AD%90%E5%BA%8F%E5%92%8C.html)
 
 ---
 
-## 编辑距离总结篇
+## Leetcode 392. 判断子序列
+
+#### 题目链接：[题目](https://leetcode.cn/problems/is-subsequence/)
+
+#### 思路：
+编辑距离的入门题（这里只涉及“删除”），为后面的编辑距离打基础。
+
+
+
+```Python
+class Solution:
+    def isSubsequence(self, s: str, t: str) -> bool:
+        i, j = 0 , 0
+
+        while i < len(s) and j < len(t):
+            if s[i] == t[j]:
+                i += 1
+            j += 1
+        
+        return i == len(s)
+```
 
 #### 参考
-- [为了绝杀编辑距离，卡尔做了三步铺垫](https://programmercarl.com/%E4%B8%BA%E4%BA%86%E7%BB%9D%E6%9D%80%E7%BC%96%E8%BE%91%E8%B7%9D%E7%A6%BB%EF%BC%8C%E5%8D%A1%E5%B0%94%E5%81%9A%E4%BA%86%E4%B8%89%E6%AD%A5%E9%93%BA%E5%9E%AB.html)
+- [文章讲解](https://programmercarl.com/0392.%E5%88%A4%E6%96%AD%E5%AD%90%E5%BA%8F%E5%88%97.html)
 
 ## 总结
 
