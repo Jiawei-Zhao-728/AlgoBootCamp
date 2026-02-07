@@ -13,7 +13,28 @@
 
 
 ```Python
+class Solution:
+    def countSubstrings(self, s: str) -> int:
+        # 中心扩展法：
 
+        n = len(s)
+        count = 0
+
+        def center (l, r):
+            cnt = 0
+
+            while l >= 0 and r < n and s[l] == s[r]:
+                l -= 1
+                r += 1
+                cnt += 1
+
+            return cnt
+
+        for i in range(n):
+            count += center(i, i)
+            count += center(i, i + 1)
+
+        return count
 ```
 
 #### 参考
@@ -28,9 +49,27 @@
 #### 思路：
 647 求的是**回文子串**，本题要求的是**回文子序列**，要搞清楚两者之间的区别（子串连续、子序列可不连续）。
 
+这道题其实蛮难的，这个 dp Array 的概念蛮神奇
 
 ```Python
+class Solution:
+    def longestPalindromeSubseq(self, s: str) -> int:
+        n = len(s)
+        dp = [[0] * n for _ in range(n)]
 
+        for i in range(n):
+            dp[i][i] = 1
+
+        for l in range(2, n + 1):
+            for i in range(n - l + 1):
+                j = i + l - 1
+                
+                if s[i] == s[j]:
+                    dp[i][j] = dp[i + 1][j - 1] + 2 
+                else:
+                    dp[i][j] = max(dp[i + 1][j], dp[i][j - 1])
+
+        return dp[0][n - 1]
 ```
 
 #### 参考
