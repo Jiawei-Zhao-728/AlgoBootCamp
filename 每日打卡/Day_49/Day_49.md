@@ -13,6 +13,28 @@
 
 
 ```Python
+class Solution:
+    def trap(self, height: List[int]) -> int:
+        l_max, r_max = 0, 0
+        r, l = len(height) - 1 , 0
+        water = 0
+
+        while l < r:
+            if height[l] < height[r]:
+                if height[l] >= l_max:
+                    l_max = height[l]
+                else:
+                    water += l_max - height[l]
+                
+                l += 1
+            else:
+                if height[r] >= r_max:
+                    r_max = height[r]
+                else:
+                    water += r_max - height[r]
+                r -= 1
+        
+        return water
 
 ```
 
@@ -30,7 +52,21 @@
 
 
 ```Python
+class Solution:
+    def largestRectangleArea(self, heights: List[int]) -> int:
+        stack = []
+        max_area = 0
+        heights = [0] + heights + [0]
 
+        for i in range (len(heights)):
+            while stack and heights[i] < heights[stack[-1]]:
+                h = heights[stack.pop()]
+                w = i - stack[-1] -1
+                max_area = max(max_area, h * w)
+
+            stack.append(i) 
+
+        return max_area
 ```
 
 #### 参考
